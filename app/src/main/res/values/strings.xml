@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">待办事项</string>
+    <string name="add_todo">添加待办</string>
+    <string name="todo_hint">输入待办事项...</string>
+    <string name="delete">删除</string>
+    <string name="empty_todo_list">暂无待办事项</string>
+    <string name="add_button">添加</string>
+</resources>

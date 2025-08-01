@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/sort_default"
+        android:title="默认" />
+    <item
+        android:id="@+id/sort_priority"
+        android:title="按优先级" />
+    <item
+        android:id="@+id/sort_alphabetical"
+        android:title="按字母顺序" />
+    <item
+        android:id="@+id/sort_completion"
+        android:title="按完成状态" />
+</menu>

@@ -1,0 +1,46 @@
+# Android构建文件
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# 签名文件（敏感信息，不应提交）
+*.jks
+*.keystore
+keystore.properties
+
+# APK文件
+*.apk
+*.aab
+
+# 日志文件
+*.log
+
+# 临时文件
+*.tmp
+*.temp
+
+# 系统文件
+Thumbs.db
+.DS_Store
+
+# IDE文件
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 构建输出
+/app/build/
+/build/

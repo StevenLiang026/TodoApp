@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:background="#ffffff"
+    android:layout_marginBottom="2dp">
+
+    <!-- 主要内容区域 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <!-- 复选框 -->
+        <CheckBox
+            android:id="@+id/checkBoxCompleted"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp" />
+
+        <!-- 任务内容区域 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <!-- 任务文本 -->
+            <TextView
+                android:id="@+id/textViewTodo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="任务内容"
+                android:textSize="16sp"
+                android:textColor="#333333"
+                android:layout_marginBottom="4dp" />
+
+            <!-- 优先级和时间信息 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <!-- 优先级标签 -->
+                <TextView
+                    android:id="@+id/textViewPriority"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="普通"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:background="#E8F5E8"
+                    android:padding="4dp"
+                    android:layout_marginEnd="8dp" />
+
+                <!-- 时间信息 -->
+                <TextView
+                    android:id="@+id/textViewTime"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="创建时间"
+                    android:textSize="11sp"
+                    android:textColor="#666666"
+                    android:gravity="center_vertical" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- 删除按钮 -->
+        <Button
+            android:id="@+id/buttonDelete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="删除"
+            android:textSize="12sp"
+            android:background="#FFEBEE"
+            android:textColor="#F44336"
+            android:padding="8dp"
+            android:minWidth="60dp" />
+
+    </LinearLayout>
+
+</LinearLayout>

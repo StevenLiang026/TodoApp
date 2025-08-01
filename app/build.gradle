@@ -1,0 +1,73 @@
+plugins {
+    id 'com.android.application'
+}
+
+// 读取签名配置
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+android {
+    namespace 'com.example.todoapp'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.example.todoapp"
+        minSdk 21
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+    }
+
+    // Java工具链配置
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    // 构建功能配置
+    buildFeatures {
+        buildConfig = true
+    }
+
+    // 签名配置
+    signingConfigs {
+        release {
+            storeFile file('todoapp-release-key.jks')
+            storePassword 'todoapp123'
+            keyAlias 'todoapp-key'
+            keyPassword 'todoapp123'
+        }
+        debug {
+            storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+        debug {
+            signingConfig signingConfigs.debug
+        }
+    }
+}
+
+dependencies {
+    // 网络请求库
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
+    
+    // JSON 解析
+    implementation 'com.google.code.gson:gson:2.10.1'
+}
+
