@@ -1,24 +1,21 @@
 package com.example.todoapp.model;
 
 /**
- * 注册响应数据模型
+ * 注册响应数据模型 - 匹配后端API格式
  */
 public class RegisterResponse {
-    private boolean success;
     private String message;
-    private RegisterData data;
+    private String token;
+    private User user;
     
     public RegisterResponse() {
         super();
         // 默认构造函数
     }
     
+    // 为了兼容现有代码，添加isSuccess方法
     public boolean isSuccess() {
-        return success;
-    }
-    
-    public void setSuccess(boolean success) {
-        this.success = success;
+        return message != null && (message.contains("成功") || message.contains("success"));
     }
     
     public String getMessage() {
@@ -29,30 +26,38 @@ public class RegisterResponse {
         this.message = message;
     }
     
-    public RegisterData getData() {
-        return data;
+    public String getToken() {
+        return token;
     }
     
-    public void setData(RegisterData data) {
-        this.data = data;
+    public void setToken(String token) {
+        this.token = token;
     }
     
-    public static class RegisterData {
-        private int userId;
+    public User getUser() {
+        return user;
+    }
+    
+    public void setUser(User user) {
+        this.user = user;
+    }
+    
+    public static class User {
+        private int id;
         private String username;
         private String email;
         
-        public RegisterData() {
+        public User() {
             super();
             // 默认构造函数
         }
         
-        public int getUserId() {
-            return userId;
+        public int getId() {
+            return id;
         }
         
-        public void setUserId(int userId) {
-            this.userId = userId;
+        public void setId(int id) {
+            this.id = id;
         }
         
         public String getUsername() {

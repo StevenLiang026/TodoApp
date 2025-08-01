@@ -1,24 +1,21 @@
 package com.example.todoapp.model;
 
 /**
- * 登录响应数据模型
+ * 登录响应数据模型 - 匹配后端API格式
  */
 public class LoginResponse {
-    private boolean success;
     private String message;
-    private LoginData data;
+    private String token;
+    private User user;
     
     public LoginResponse() {
         super();
         // 默认构造函数
     }
     
+    // 为了兼容现有代码，添加isSuccess方法
     public boolean isSuccess() {
-        return success;
-    }
-    
-    public void setSuccess(boolean success) {
-        this.success = success;
+        return message != null && (message.contains("成功") || message.contains("success"));
     }
     
     public String getMessage() {
@@ -29,12 +26,31 @@ public class LoginResponse {
         this.message = message;
     }
     
-    public LoginData getData() {
-        return data;
+    public String getToken() {
+        return token;
     }
     
-    public void setData(LoginData data) {
-        this.data = data;
+    public void setToken(String token) {
+        this.token = token;
+    }
+    
+    public User getUser() {
+        return user;
+    }
+    
+    public void setUser(User user) {
+        this.user = user;
+    }
+    
+    // 为了兼容现有代码，添加getData方法
+    public LoginData getData() {
+        if (token != null && user != null) {
+            LoginData data = new LoginData();
+            data.setToken(token);
+            data.setUser(user);
+            return data;
+        }
+        return null;
     }
     
     public static class LoginData {
