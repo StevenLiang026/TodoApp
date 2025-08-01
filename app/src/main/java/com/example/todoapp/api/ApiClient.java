@@ -9,10 +9,12 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * API 客户端管理类
  */
 public class ApiClient {
-    // Vercel 部署地址
-    private static final String BASE_URL = "https://todo-app-backend-2gp1068s5-tavianliangs-projects.vercel.app/";
+    // Vercel 生产部署地址
+    private static final String BASE_URL = "https://todo-app-backend-ten-gamma.vercel.app/";
     
-    // 本地开发地址（可选）
+    // 备用地址（如果上面的不工作，请尝试这些）
+    // private static final String BASE_URL = "https://todo-app-backend-git-main-tavianliangs-projects.vercel.app/";
+    // private static final String BASE_URL = "https://todo-app-backend-2gp1068s5-tavianliangs-projects.vercel.app/";
     // private static final String BASE_URL = "http://10.0.2.2:3000/"; // Android 模拟器
     // private static final String BASE_URL = "http://192.168.1.100:3000/"; // 真机测试（替换为你的电脑IP）
     
