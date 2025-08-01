@@ -1,104 +1,43 @@
-// Vercel Serverless Function - 简化版本
-module.exports = (req, res) => {
-    // 设置CORS
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    
-    // 处理OPTIONS请求
-    if (req.method === 'OPTIONS') {
-        res.status(200).end();
-        return;
-    }
+// Vercel Serverless Function - 最简版本
+export default function handler(req, res) {
+    try {
+        // 设置CORS
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        
+        // 处理OPTIONS请求
+        if (req.method === 'OPTIONS') {
+            return res.status(200).end();
+        }
 
-    // 解析URL路径
-    const url = req.url || '';
-    const method = req.method;
+        // 健康检查接口
+        if (req.url === '/api/health' || req.url === '/health') {
+            return res.status(200).json({
+                success: true,
+                message: 'TodoApp 服务器运行正常',
+                timestamp: new Date().toISOString(),
+                vercel: true
+            });
+        }
 
-    // 健康检查接口
-    if (url.includes('/health') && method === 'GET') {
-        res.status(200).json({
+        // 默认响应
+        return res.status(200).json({
             success: true,
-            message: 'TodoApp 服务器运行正常',
-            timestamp: new Date().toISOString(),
-            url: url,
-            method: method
+            message: 'TodoApp API 正在运行',
+            url: req.url,
+            method: req.method,
+            timestamp: new Date().toISOString()
         });
-        return;
-    }
 
-    // 注册接口
-    if (url.includes('/register') && method === 'POST') {
-        res.status(200).json({
-            success: true,
-            message: '注册功能正常',
-            data: {
-                userId: 1,
-                username: 'test',
-                email: 'test@example.com'
-            }
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: '服务器内部错误',
+            error: error.message
         });
-        return;
     }
-
-    // 登录接口
-    if (url.includes('/login') && method === 'POST') {
-        res.status(200).json({
-            success: true,
-            message: '登录功能正常',
-            data: {
-                token: 'test_token_123',
-                user: {
-                    id: 1,
-                    username: 'test',
-                    email: 'test@example.com'
-                }
-            }
-        });
-        return;
-    }
-
-    // 待办事项接口
-    if (url.includes('/todos') && method === 'POST') {
-        res.status(201).json({
-            success: true,
-            message: '待办事项创建成功',
-            data: {
-                id: 1,
-                text: '测试待办事项',
-                priority: 'MEDIUM',
-                priorityColor: '#FFA500',
-                isCompleted: false,
-                createTime: new Date().toISOString(),
-                completeTime: null
-            }
-        });
-        return;
-    }
-
-    // 获取待办事项接口
-    if (url.includes('/todos') && method === 'GET') {
-        res.status(200).json({
-            success: true,
-            message: '查询成功',
-            data: {
-                todos: [],
-                total: 0,
-                page: 1,
-                limit: 50
-            }
-        });
-        return;
-    }
-
-    // 默认响应
-    res.status(404).json({
-        success: false,
-        message: '接口不存在',
-        url: url,
-        method: method
-    });
-};
+}
 
 // 创建数据表
 db.serialize(() => {
