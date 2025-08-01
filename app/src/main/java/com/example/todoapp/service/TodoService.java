@@ -85,18 +85,35 @@ public class TodoService {
     public void register(String username, String email, String password, RegisterCallback callback) {
         RegisterRequest request = new RegisterRequest(username, email, password);
         
+        Log.d(TAG, "开始注册请求 - 用户名: " + username + ", 邮箱: " + email);
+        
         apiService.register(request).enqueue(new Callback<RegisterResponse>() {
             @Override
             public void onResponse(Call<RegisterResponse> call, Response<RegisterResponse> response) {
+                Log.d(TAG, "注册响应 - HTTP状态码: " + response.code());
+                
                 if (response.isSuccessful() && response.body() != null) {
                     RegisterResponse registerResponse = response.body();
-                    if (registerResponse.isSuccess()) {
+                    Log.d(TAG, "注册响应内容 - message: " + registerResponse.getMessage() + 
+                              ", token: " + (registerResponse.getToken() != null ? "存在" : "null") +
+                              ", user: " + (registerResponse.getUser() != null ? "存在" : "null"));
+                    
+                    // 检查是否有token，如果有token说明注册成功
+                    if (registerResponse.getToken() != null && !registerResponse.getToken().isEmpty()) {
                         callback.onSuccess(registerResponse.getMessage());
                     } else {
-                        callback.onError(registerResponse.getMessage());
+                        callback.onError(registerResponse.getMessage() != null ? registerResponse.getMessage() : "注册失败");
                     }
                 } else {
-                    callback.onError("注册失败：服务器错误");
+                    Log.e(TAG, "注册失败 - HTTP状态码: " + response.code());
+                    try {
+                        String errorBody = response.errorBody() != null ? response.errorBody().string() : "无错误详情";
+                        Log.e(TAG, "错误响应内容: " + errorBody);
+                        callback.onError("注册失败：服务器错误 (状态码: " + response.code() + ")");
+                    } catch (Exception e) {
+                        Log.e(TAG, "读取错误响应失败", e);
+                        callback.onError("注册失败：服务器错误");
+                    }
                 }
             }
             
