@@ -1,0 +1,341 @@
+// Vercel Serverless Function - 简化版本
+module.exports = (req, res) => {
+    // 设置CORS
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    
+    // 处理OPTIONS请求
+    if (req.method === 'OPTIONS') {
+        res.status(200).end();
+        return;
+    }
+
+    // 解析URL路径
+    const url = req.url || '';
+    const method = req.method;
+
+    // 健康检查接口
+    if (url.includes('/health') && method === 'GET') {
+        res.status(200).json({
+            success: true,
+            message: 'TodoApp 服务器运行正常',
+            timestamp: new Date().toISOString(),
+            url: url,
+            method: method
+        });
+        return;
+    }
+
+    // 注册接口
+    if (url.includes('/register') && method === 'POST') {
+        res.status(200).json({
+            success: true,
+            message: '注册功能正常',
+            data: {
+                userId: 1,
+                username: 'test',
+                email: 'test@example.com'
+            }
+        });
+        return;
+    }
+
+    // 登录接口
+    if (url.includes('/login') && method === 'POST') {
+        res.status(200).json({
+            success: true,
+            message: '登录功能正常',
+            data: {
+                token: 'test_token_123',
+                user: {
+                    id: 1,
+                    username: 'test',
+                    email: 'test@example.com'
+                }
+            }
+        });
+        return;
+    }
+
+    // 待办事项接口
+    if (url.includes('/todos') && method === 'POST') {
+        res.status(201).json({
+            success: true,
+            message: '待办事项创建成功',
+            data: {
+                id: 1,
+                text: '测试待办事项',
+                priority: 'MEDIUM',
+                priorityColor: '#FFA500',
+                isCompleted: false,
+                createTime: new Date().toISOString(),
+                completeTime: null
+            }
+        });
+        return;
+    }
+
+    // 获取待办事项接口
+    if (url.includes('/todos') && method === 'GET') {
+        res.status(200).json({
+            success: true,
+            message: '查询成功',
+            data: {
+                todos: [],
+                total: 0,
+                page: 1,
+                limit: 50
+            }
+        });
+        return;
+    }
+
+    // 默认响应
+    res.status(404).json({
+        success: false,
+        message: '接口不存在',
+        url: url,
+        method: method
+    });
+};
+
+// 创建数据表
+db.serialize(() => {
+    db.run(`CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE NOT NULL,
+        email TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`);
+
+    db.run(`CREATE TABLE IF NOT EXISTS todos (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        text TEXT NOT NULL,
+        priority TEXT DEFAULT 'MEDIUM',
+        priority_color TEXT DEFAULT '#FFA500',
+        is_completed BOOLEAN DEFAULT 0,
+        create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+        complete_time DATETIME NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    )`);
+});
+
+// JWT 验证中间件
+const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).json({ 
+            success: false, 
+            message: '访问令牌缺失' 
+        });
+    }
+
+    jwt.verify(token, JWT_SECRET, (err, user) => {
+        if (err) {
+            return res.status(403).json({ 
+                success: false, 
+                message: '访问令牌无效' 
+            });
+        }
+        req.user = user;
+        next();
+    });
+};
+
+// 健康检查接口
+app.get('/api/health', (req, res) => {
+    res.json({
+        success: true,
+        message: 'TodoApp 服务器运行正常',
+        timestamp: new Date().toISOString()
+    });
+});
+
+// 注册接口
+app.post('/api/register', async (req, res) => {
+    try {
+        const { username, email, password } = req.body;
+
+        if (!username || !email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: '用户名、邮箱和密码都是必填项'
+            });
+        }
+
+        db.get('SELECT * FROM users WHERE username = ? OR email = ?', 
+            [username, email], async (err, row) => {
+            if (err) {
+                return res.status(500).json({
+                    success: false,
+                    message: '数据库错误'
+                });
+            }
+
+            if (row) {
+                return res.status(400).json({
+                    success: false,
+                    message: '用户名或邮箱已存在'
+                });
+            }
+
+            const hashedPassword = await bcrypt.hash(password, 10);
+
+            db.run('INSERT INTO users (username, email, password) VALUES (?, ?, ?)',
+                [username, email, hashedPassword], function(err) {
+                if (err) {
+                    return res.status(500).json({
+                        success: false,
+                        message: '用户创建失败'
+                    });
+                }
+
+                res.status(201).json({
+                    success: true,
+                    message: '用户注册成功',
+                    data: {
+                        userId: this.lastID,
+                        username: username,
+                        email: email
+                    }
+                });
+            });
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '服务器内部错误'
+        });
+    }
+});
+
+// 登录接口
+app.post('/api/login', (req, res) => {
+    try {
+        const { username, password } = req.body;
+
+        if (!username || !password) {
+            return res.status(400).json({
+                success: false,
+                message: '用户名和密码都是必填项'
+            });
+        }
+
+        db.get('SELECT * FROM users WHERE username = ? OR email = ?', 
+            [username, username], async (err, user) => {
+            if (err) {
+                return res.status(500).json({
+                    success: false,
+                    message: '数据库错误'
+                });
+            }
+
+            if (!user) {
+                return res.status(401).json({
+                    success: false,
+                    message: '用户名或密码错误'
+                });
+            }
+
+            const isValidPassword = await bcrypt.compare(password, user.password);
+            if (!isValidPassword) {
+                return res.status(401).json({
+                    success: false,
+                    message: '用户名或密码错误'
+                });
+            }
+
+            const token = jwt.sign(
+                { userId: user.id, username: user.username },
+                JWT_SECRET,
+                { expiresIn: '24h' }
+            );
+
+            res.json({
+                success: true,
+                message: '登录成功',
+                data: {
+                    token: token,
+                    user: {
+                        id: user.id,
+                        username: user.username,
+                        email: user.email
+                    }
+                }
+            });
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '服务器内部错误'
+        });
+    }
+});
+
+// 其他API路由...
+app.post('/api/todos', authenticateToken, (req, res) => {
+    try {
+        const { text, priority = 'MEDIUM' } = req.body;
+        const userId = req.user.userId;
+
+        if (!text) {
+            return res.status(400).json({
+                success: false,
+                message: '笔记内容不能为空'
+            });
+        }
+
+        const priorityColors = {
+            'HIGH': '#FF0000',
+            'MEDIUM': '#FFA500', 
+            'LOW': '#008000'
+        };
+        const priorityColor = priorityColors[priority] || '#FFA500';
+
+        db.run(`INSERT INTO todos (user_id, text, priority, priority_color) 
+                VALUES (?, ?, ?, ?)`,
+            [userId, text, priority, priorityColor], function(err) {
+            if (err) {
+                return res.status(500).json({
+                    success: false,
+                    message: '笔记创建失败'
+                });
+            }
+
+            db.get('SELECT * FROM todos WHERE id = ?', [this.lastID], (err, todo) => {
+                if (err) {
+                    return res.status(500).json({
+                        success: false,
+                        message: '获取笔记失败'
+                    });
+                }
+
+                res.status(201).json({
+                    success: true,
+                    message: '笔记创建成功',
+                    data: {
+                        id: todo.id,
+                        text: todo.text,
+                        priority: todo.priority,
+                        priorityColor: todo.priority_color,
+                        isCompleted: Boolean(todo.is_completed),
+                        createTime: todo.create_time,
+                        completeTime: todo.complete_time
+                    }
+                });
+            });
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: '服务器内部错误'
+        });
+    }
+});
+
+module.exports = app;

@@ -9,8 +9,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * API 客户端管理类
  */
 public class ApiClient {
-    // 云端服务器地址 - 部署后替换为实际地址
-    private static final String BASE_URL = "https://your-app-name.herokuapp.com/"; 
+    // 云端服务器地址 - Vercel部署地址
+    private static final String BASE_URL = "https://todo-2ue48kdh8-tavianliangs-projects.vercel.app/api/";
     
     // 本地开发地址（可选）
     // private static final String BASE_URL = "http://10.0.2.2:3000/"; // Android 模拟器
