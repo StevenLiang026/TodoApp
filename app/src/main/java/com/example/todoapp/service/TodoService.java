@@ -131,26 +131,49 @@ public class TodoService {
     public void login(String username, String password, LoginCallback callback) {
         LoginRequest request = new LoginRequest(username, password);
         
+        Log.d(TAG, "开始登录请求 - 用户名: " + username);
+        
         apiService.login(request).enqueue(new Callback<LoginResponse>() {
             @Override
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+                Log.d(TAG, "登录响应 - HTTP状态码: " + response.code());
+                
                 if (response.isSuccessful() && response.body() != null) {
                     LoginResponse loginResponse = response.body();
+                    Log.d(TAG, "登录响应内容 - message: " + loginResponse.getMessage() + 
+                              ", token: " + (loginResponse.getToken() != null ? "存在" : "null") +
+                              ", user: " + (loginResponse.getUser() != null ? "存在" : "null"));
+                    
                     if (loginResponse.isSuccess()) {
                         LoginResponse.LoginData loginData = loginResponse.getData();
-                        // 保存登录信息到本地
-                        sessionManager.saveLoginSession(
-                                loginData.getToken(),
-                                loginData.getUser().getId(),
-                                loginData.getUser().getUsername(),
-                                loginData.getUser().getEmail()
-                        );
-                        callback.onSuccess(loginData);
+                        if (loginData != null && loginData.getToken() != null && loginData.getUser() != null) {
+                            // 保存登录信息到本地
+                            sessionManager.saveLoginSession(
+                                    loginData.getToken(),
+                                    loginData.getUser().getId(),
+                                    loginData.getUser().getUsername(),
+                                    loginData.getUser().getEmail()
+                            );
+                            Log.d(TAG, "登录成功，已保存会话信息");
+                            callback.onSuccess(loginData);
+                        } else {
+                            Log.e(TAG, "登录数据不完整 - loginData: " + (loginData != null ? "存在" : "null"));
+                            callback.onError("登录数据不完整");
+                        }
                     } else {
-                        callback.onError(loginResponse.getMessage());
+                        Log.e(TAG, "登录失败 - 服务器返回: " + loginResponse.getMessage());
+                        callback.onError(loginResponse.getMessage() != null ? loginResponse.getMessage() : "登录失败");
                     }
                 } else {
-                    callback.onError("登录失败：服务器错误");
+                    Log.e(TAG, "登录失败 - HTTP状态码: " + response.code());
+                    try {
+                        String errorBody = response.errorBody() != null ? response.errorBody().string() : "无错误详情";
+                        Log.e(TAG, "错误响应内容: " + errorBody);
+                        callback.onError("登录失败：服务器错误 (状态码: " + response.code() + ")");
+                    } catch (Exception e) {
+                        Log.e(TAG, "读取错误响应失败", e);
+                        callback.onError("登录失败：服务器错误");
+                    }
                 }
             }
             
